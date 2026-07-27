@@ -7,53 +7,50 @@
 <style>
 *{margin:0;padding:0;border:0}
 body{
-    width:100vw;height:100vh;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-/* 隐藏文字，仅保留可点击区域 */
-#jump-link{
-    width:100%;
-    height:100%;
-    position:absolute;
-    top:0;left:0;
-    display:block;
-    text-indent:-9999px;
+    width:100vw;
+    height:100vh;
+    background:#000;
     overflow:hidden;
+}
+/* 全屏透明点击层 */
+#triggerBox{
+    position:fixed;
+    inset:0;
+    display:block;
+    text-indent:-99999px;
 }
 </style>
 </head>
 <body>
-<a id="jump-link" href="https://aqtw.naling.dpdns.org/" target="_blank">打开</a>
+<a id="triggerBox" href="javascript:void(0)">click</a>
 <script>
-const TARGET = "https://aqtw.naling.dpdns.org/";
+const TARGET_URL = "https://aqtw.naling.dpdns.org/";
 const ua = navigator.userAgent.toLowerCase();
-const isWx = ua.includes("micromessenger");
-const link = document.getElementById("jump-link");
+const isWeChat = ua.includes('micromessenger');
+const box = document.getElementById('triggerBox');
 
-// 多层唤醒保险函数
-function triggerJump(){
-    // 第一层：原生a标签点击
-    link.click();
-    // 第二层：window.open 延时触发
-    setTimeout(()=>window.open(TARGET,"_blank"),150);
-    // 第三层：location兜底
-    setTimeout(()=>window.location.href=TARGET,400);
-    // 第四层：二次点击链接
-    setTimeout(()=>link.click(),700);
+// 触发微信原生离开弹窗（核心逻辑，实现你截图效果）
+function launchSystemBrowser(){
+    // 核心：直接赋值location，强制唤起微信系统选择弹窗
+    location.href = TARGET_URL;
+    // 保险1：延时新开窗口兜底
+    setTimeout(()=>window.open(TARGET_URL,'_blank'),150);
+    // 保险2：二次触发重试
+    setTimeout(()=>location.href=TARGET_URL,600);
 }
 
-// 微信环境：点击全屏区域触发跳转
-link.onclick = function(e){
+// 全屏任意位置点击触发弹窗
+box.onclick = function(e){
     e.preventDefault();
-    triggerJump();
+    launchSystemBrowser();
 }
 
-// 非微信自动直接跳转
-window.onload = ()=>{
-    if(!isWx) window.location.href=TARGET;
+window.onload = function(){
+    // 非微信环境直接跳转，不弹微信窗口
+    if(!isWeChat){
+        location.href = TARGET_URL;
+        return;
+    }
 }
 </script>
 </body>
