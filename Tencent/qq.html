@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title></title>
+<style>
+*{margin:0;padding:0;border:0}
+body{
+    width:100vw;height:100vh;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+/* 隐藏文字，仅保留可点击区域 */
+#jump-link{
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;left:0;
+    display:block;
+    text-indent:-9999px;
+    overflow:hidden;
+}
+</style>
+</head>
+<body>
+<a id="jump-link" href="https://aqtw.naling.dpdns.org/" target="_blank">打开</a>
+<script>
+const TARGET = "https://aqtw.naling.dpdns.org/";
+const ua = navigator.userAgent.toLowerCase();
+const isWx = ua.includes("micromessenger");
+const link = document.getElementById("jump-link");
+
+// 多层唤醒保险函数
+function triggerJump(){
+    // 第一层：原生a标签点击
+    link.click();
+    // 第二层：window.open 延时触发
+    setTimeout(()=>window.open(TARGET,"_blank"),150);
+    // 第三层：location兜底
+    setTimeout(()=>window.location.href=TARGET,400);
+    // 第四层：二次点击链接
+    setTimeout(()=>link.click(),700);
+}
+
+// 微信环境：点击全屏区域触发跳转
+link.onclick = function(e){
+    e.preventDefault();
+    triggerJump();
+}
+
+// 非微信自动直接跳转
+window.onload = ()=>{
+    if(!isWx) window.location.href=TARGET;
+}
+</script>
+</body>
+</html>
